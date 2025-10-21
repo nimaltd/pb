@@ -3,7 +3,7 @@
 A lightweight and efficient **push-button driver** written in C for STM32 (HAL-based).  
 
 Unlike simple polling implementations, this library uses a **non-blocking, timer-driven approach**, allowing the CPU to continue other tasks.  
-It can run on **any GPIO pins** and supports multiple buttons simultaneously.  
+It can run on **any GPIO pins** and supports multiple buttons (up to 31) simultaneously.  
 
 The library is designed for:  
 
