@@ -9,7 +9,7 @@ The library is designed for:
 
 - Projects where CPU blocking must be avoided  
 - Applications that require short and long press detection  
-- Easy portability across STM32 families (F0/F1/F3/F4/F7/G0/G4/H7, etc.)  
+- Easy portability across STM32 families 
 
 ---
 
@@ -39,16 +39,7 @@ Add these files to your STM32 project:
 
 ## 🔧 Configuration (`pb_config.h`)  
 
-Defines library parameters and timing values. Example:  
-
-```c
-#define PB_TIM                htim3        // Timer used for periodic scanning
-#define PB_INTERVAL_MS        10           // Scan interval in milliseconds
-#define PB_SHORT_TIME_MS      50           // Minimum duration for short press
-#define PB_LONG_TIME_MS       1000         // Minimum duration for long press
-#define PB_EVN_QUEUE_SIZE     8            // Size of the event queue
-#define PB_KEY_COUNT          3            // Number of buttons
-```  
+Defines library parameters and timing values. 
 
 ---
 
@@ -59,7 +50,7 @@ Defines library parameters and timing values. Example:
 
 2. **Timer**  
    - Use **internal clock source**.  
-   - Set prescaler so that the timer tick matches `PB_INTERVAL_MS`.  
+   - Set prescaler so that the timer tick matches `PB_INTERVAL_MS`. e.g. for 48Mhz bus, select 48-1.
    - Enable **Timer NVIC interrupt**.  
    - In **Project Manager → Advanced Settings**, enable **Register Callback** for the timer.  
 
@@ -148,8 +139,6 @@ int main(void)
 |----------|-------------|
 | `pb_init()` | Initialize push-button driver with config and optional callback |
 | `pb_loop()` | Retrieve next event from queue and optionally call callback |
-| `pb_evn_add()` | Internal function: add event to queue (called by ISR) |
-| `pb_tim_cb()` | Timer callback that scans all buttons (must be registered with timer) |
 
 ---
 
