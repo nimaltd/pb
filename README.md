@@ -121,12 +121,7 @@ int main(void)
 
     while (1)
     {
-        // Optional: also poll events if needed
-        pb_evn_t pb_evn = pb_loop();
-        if (pb_evn)
-        {
-            // Manual handling if desired
-        }
+        pb_loop();
     }
 }
 ```
