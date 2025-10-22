@@ -35,9 +35,6 @@
 
 /* USER CODE BEGIN PB_CONFIGURATION */
 
-/* Number of buttons configured */
-#define PB_KEY_COUNT        3
-
 /* Timer used for periodic button scanning */
 #define PB_TIM              htim3
 
@@ -51,7 +48,15 @@
 #define PB_LONG_TIME_MS     1000
 
 /* Size of the event queue (number of events that can be stored) */
-#define PB_EVN_QUEUE_SIZE   8
+#define PB_EVN_QUEUE_SIZE   4
+
+/* Number of buttons configured */
+#define PB_CONFIG_COUNT     3
+
+/* Pin definitions */
+#define PB_CONFIG           {.gpio = KEY_DOWN_GPIO_Port,  .pin = KEY_DOWN_Pin}, \
+                            {.gpio = KEY_UP_GPIO_Port,    .pin = KEY_UP_Pin},   \
+                            {.gpio = KEY_ENTER_GPIO_Port, .pin = KEY_ENTER_Pin}
 
 /* USER CODE END PB_CONFIGURATION */
 

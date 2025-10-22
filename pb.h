@@ -61,9 +61,8 @@ typedef struct __PACKED
 /* Main handle for push-button driver */
 typedef struct
 {
-  pb_config_t         *config;                    /* Pointer to button configuration array */
   void                (*callback)(bool, pb_evn_t);/* Optional event callback: is_long, key_mask */
-  uint16_t            cnt[PB_KEY_COUNT];          /* Press duration counters for each button */
+  uint16_t            cnt[PB_CONFIG_COUNT];       /* Press duration counters for each button */
   pb_evn_t            evn[PB_EVN_QUEUE_SIZE];     /* Circular event buffer */
   __IO uint32_t       evn_head;                   /* Head index of the event queue (written by ISR) */
   __IO uint32_t       evn_tail;                   /* Tail index of the event queue (read by main loop) */
@@ -75,7 +74,10 @@ typedef struct
 /*************************************************************************************************/
 
 /* Initialize the push-button driver */
-void      pb_init(const pb_config_t *config, void (*callback)(bool, pb_evn_t));
+void      pb_init(void (*callback)(bool, pb_evn_t));
+
+/* Clear pending events */
+void      pb_clear(void);
 
 /* Process pending button events */
 pb_evn_t  pb_loop(void);

@@ -40,7 +40,9 @@ void    pb_tim_cb(TIM_HandleTypeDef *htim);
 /** Global Variable **/
 /*************************************************************************************************/
 
-pb_t pb_handle;
+pb_t    pb_handle;
+
+const   pb_config_t pb_config[] = { PB_CONFIG };
 
 /*************************************************************************************************/
 /** Function Implementations **/
@@ -51,28 +53,21 @@ pb_t pb_handle;
  * @brief Initialize the push-button driver.
  * Sets configuration, callback, clears buffers, and starts
  * the timer interrupt for periodic button scanning.
- * @param[in] config   Pointer to button configuration array.
  * @param[in] callback Optional event callback function.
  */
-void pb_init(const pb_config_t *config, void (*callback)(bool, pb_evn_t))
+void pb_init(void (*callback)(bool, pb_evn_t))
 {
   /* Check that configuration pointer is valid */
   assert_param(config != NULL);
 
   /* Save configuration and callback */
-  pb_handle.config = (pb_config_t*)config;
   pb_handle.callback = callback;
 
-  /* Clear event buffer and press counters */
-  memset(pb_handle.evn, 0, sizeof(pb_handle.evn));
-  memset(pb_handle.cnt, 0, sizeof(pb_handle.cnt));
-
-  /* Reset head and tail indices */
-  pb_handle.evn_head = 0;
-  pb_handle.evn_tail = 0;
+  /* Clear event buffer */
+  pb_clear();
 
   /* Configure timer for PB scanning */
-  __HAL_TIM_SET_AUTORELOAD(&PB_TIM, PB_INTERVAL_MS * 1000 - 1);
+  __HAL_TIM_SET_AUTORELOAD(&PB_TIM, (PB_INTERVAL_MS * 1000) - 1);
   __HAL_TIM_SET_COUNTER(&PB_TIM, 0);
 
   /* Register callback and start timer interrupt */
@@ -82,11 +77,25 @@ void pb_init(const pb_config_t *config, void (*callback)(bool, pb_evn_t))
 
 /*************************************************************************************************/
 /**
+ * @brief Clear pending events.
+ */
+void pb_clear(void)
+{
+  /* Reset head and tail indices */
+  pb_handle.evn_head = 0;
+  pb_handle.evn_tail = 0;
+
+  /* Clear event buffer and press counters */
+  memset(pb_handle.evn, 0, sizeof(pb_handle.evn));
+  memset(pb_handle.cnt, 0, sizeof(pb_handle.cnt));
+}
+
+/*************************************************************************************************/
+/**
  * @brief Process pending button events.
  * Retrieves next event from the queue and calls the user callback
  * (if registered). Returns the event for manual polling.
  */
-/*************************************************************************************************/
 pb_evn_t pb_loop(void)
 {
   pb_evn_t event = 0;
@@ -137,10 +146,10 @@ void pb_evn_add(pb_evn_t event)
  */
 void pb_tim_cb(TIM_HandleTypeDef *htim)
 {
-  for (uint8_t i = 0; i < PB_KEY_COUNT; i++)
+  for (uint8_t i = 0; i < PB_CONFIG_COUNT; i++)
   {
     /* Released (logic high) */
-    if (pb_handle.config[i].gpio->IDR & pb_handle.config[i].pin)
+    if (pb_config[i].gpio->IDR & pb_config[i].pin)
     {
       if (pb_handle.cnt[i] >= (PB_LONG_TIME_MS / PB_INTERVAL_MS))
       {
