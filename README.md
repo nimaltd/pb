@@ -15,7 +15,7 @@ The library is designed for:
 
 ## ✨ Features  
 
-- 🔹 Multi-button support (`PB_KEY_COUNT`)  
+- 🔹 Multi-button support (`PB_CONFIG_COUNT`)  
 - 🔹 Short and long press detection (`PB_SHORT_TIME_MS`, `PB_LONG_TIME_MS`)  
 - 🔹 Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
 - 🔹 Optional callback on button events  
@@ -34,6 +34,10 @@ Add these files to your STM32 project:
 - `pb.h`  
 - `pb.c`  
 - `pb_config.h`  
+
+### 2. STM32Cube Pack Installer
+Available in the official pack repo:  
+👉 [STM32-PACK](https://github.com/nimaltd/STM32-PACK)  (Not Ready)
 
 ---
 
