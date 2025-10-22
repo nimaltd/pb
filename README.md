@@ -54,7 +54,7 @@ Defines library parameters and timing values.
 
 2. **Timer**  
    - Use **internal clock source**.  
-   - Set prescaler so that the timer tick matches `PB_INTERVAL_MS`. e.g. for 48Mhz bus, select 48-1.
+   - Set prescaler to get 1us tick. e.g. for 48Mhz bus, select 48-1.
    - Enable **Timer NVIC interrupt**.  
    - In **Project Manager → Advanced Settings**, enable **Register Callback** for the timer.  
 
@@ -67,31 +67,22 @@ Defines library parameters and timing values.
 #include "pb.h"
 ```
 
-### Define button configuration  
-```c
-const pb_config_t pb_config[] =
-{
-    { .gpio = KEY_DOWN_GPIO_Port,  .pin = KEY_DOWN_Pin  },
-    { .gpio = KEY_UP_GPIO_Port,    .pin = KEY_UP_Pin    },
-    { .gpio = KEY_ENTER_GPIO_Port, .pin = KEY_ENTER_Pin }
-};
-```
-
----
-
 ### 1️⃣ Polling mode (no callback)  
 ```c
 int main(void)
 {
     pb_evn_t pb_evn;
 
-    pb_init(pb_config, NULL); // Initialize without callback
+    pb_init(NULL); // Initialize without callback
 
     while (1)
     {
         pb_evn = pb_loop(); // Get next event from queue
         if (pb_evn)
         {
+            // 0x00000001 for short press, first key
+            // 0x00000002 for short press, second key
+            // 0x00000004 for short press, third key
             // Handle button event manually
         }
     }
@@ -121,7 +112,7 @@ void my_pb_callback(bool is_long, pb_evn_t key_mask)
 ```c
 int main(void)
 {
-    pb_init(pb_config, my_pb_callback); // Initialize with callback
+    pb_init(my_pb_callback); // Initialize with callback
 
     while (1)
     {
@@ -137,7 +128,8 @@ int main(void)
 | Function | Description |
 |----------|-------------|
 | `pb_init()` | Initialize push-button driver with config and optional callback |
-| `pb_loop()` | Retrieve next event from queue and optionally call callback |
+| `pb_clear()` | Clear pending events |
+| `pb_loop()` | Retrieve event from queue and optionally call callback |
 
 ---
 
