@@ -8,7 +8,7 @@ It can run on **any GPIO pins** and supports multiple buttons (up to 31) simulta
 The library is designed for:  
 
 - Projects where CPU blocking must be avoided  
-- Applications that require short and long press detection  
+- Applications that require short and long press detection
 - Easy portability across STM32 families 
 
 ---
@@ -18,7 +18,8 @@ The library is designed for:
 - 🔹 Multi-button support (`PB_CONFIG_COUNT`)  
 - 🔹 Short and long press detection (`PB_SHORT_TIME_MS`, `PB_LONG_TIME_MS`)  
 - 🔹 Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
-- 🔹 Optional callback on button events  
+- 🔹 Optional callback on button events
+- 🔹 Debouncing for all bottons
 - 🔹 Non-blocking operation via timer interrupts  
 - 🔹 Fully STM32 HAL compatible  
 - 🔹 Lightweight and modular design  
