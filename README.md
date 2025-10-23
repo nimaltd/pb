@@ -56,7 +56,8 @@ Defines library parameters and timing values.
 2. **Timer**  
    - Use **internal clock source**.  
    - Set prescaler to get 1us tick. e.g. for 48Mhz bus, select 48-1.
-   - Enable **Timer NVIC interrupt**.  
+   - Enable **Timer NVIC interrupt**.
+   - In Project Manager → Code Generator, enable Generate Peripheral initialization as a pair ".c/.h" files per peripheral.
    - In **Project Manager → Advanced Settings**, enable **Register Callback** for the timer.  
 
 ---
