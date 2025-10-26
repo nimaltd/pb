@@ -19,7 +19,7 @@ The library is designed for:
 - 🔹 Short and long press detection (`PB_SHORT_TIME_MS`, `PB_LONG_TIME_MS`)  
 - 🔹 Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
 - 🔹 Optional callback on button events
-- 🔹 Debouncing for all bottons
+- 🔹 Debouncing for all buttons
 - 🔹 Non-blocking operation via timer interrupts  
 - 🔹 Fully STM32 HAL compatible  
 - 🔹 Lightweight and modular design  
