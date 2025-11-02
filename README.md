@@ -15,15 +15,15 @@ The library is designed for:
 
 ## ✨ Features  
 
-- 🔹 Multi-button support (`PB_CONFIG_COUNT`)  
-- 🔹 Short and long press detection (`PB_SHORT_TIME_MS`, `PB_LONG_TIME_MS`)  
-- 🔹 Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
-- 🔹 Optional callback on button events
-- 🔹 Debouncing for all buttons
-- 🔹 Non-blocking operation via timer interrupts
-- 🔹 Support beep on press event
-- 🔹 Fully STM32 HAL compatible  
-- 🔹 Lightweight and modular design  
+-  Multi-button support (`PB_CONFIG_COUNT`)  
+-  Short and long press detection (`PB_SHORT_TIME_MS`, `PB_LONG_TIME_MS`)  
+-  Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
+-  Optional callback on button events
+-  Debouncing for all buttons
+-  Non-blocking operation via timer interrupts
+-  Support beep on press event
+-  Fully STM32 HAL compatible  
+-  Lightweight and modular design  
 
 ---
 
@@ -98,7 +98,7 @@ int main(void)
 
 #### Initialize with callback  
 ```c
-/* Optional in all cases, Can handle beep on/off by a pin or timer
+/* Optional in all cases, Can handle beep on/off by a pin or timer */
 void pb_beep_on_cb(void)
 {
    // turn on buzzer pin
