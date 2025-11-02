@@ -48,13 +48,12 @@ Available in the official pack repo:
 Defines library parameters and timing values. 
 `PB_CONFIG` should be fill by your pins 
 
----`c
+```c
 /* Pin definitions */
 #define PB_CONFIG           {.gpio = KEY_DOWN_GPIO_Port,  .pin = KEY_DOWN_Pin}, \
                             {.gpio = KEY_UP_GPIO_Port,    .pin = KEY_UP_Pin},   \
                             {.gpio = KEY_ENTER_GPIO_Port, .pin = KEY_ENTER_Pin}
----
-
+```
 ---
 
 ## 🛠 CubeMX Setup  
