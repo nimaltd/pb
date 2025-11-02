@@ -20,7 +20,8 @@ The library is designed for:
 - 🔹 Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
 - 🔹 Optional callback on button events
 - 🔹 Debouncing for all buttons
-- 🔹 Non-blocking operation via timer interrupts  
+- 🔹 Non-blocking operation via timer interrupts
+- 🔹 Support beep on press event
 - 🔹 Fully STM32 HAL compatible  
 - 🔹 Lightweight and modular design  
 
@@ -69,17 +70,17 @@ Defines library parameters and timing values.
 #include "pb.h"
 ```
 
-### 1️⃣ Polling mode (no callback)  
+### 1️⃣ Normal Reading Mode 
 ```c
 int main(void)
 {
     pb_evn_t pb_evn;
 
-    pb_init(NULL); // Initialize without callback
+    pb_init();
 
     while (1)
     {
-        pb_evn = pb_loop(); // Get next event from queue
+        pb_evn = pb_read(); // Get next event from queue
         if (pb_evn)
         {
             // 0x00000001 for short press, first key
@@ -95,26 +96,26 @@ int main(void)
 
 ### 2️⃣ Callback mode  
 
-#### Define the callback function  
-```c
-void my_pb_callback(bool is_long, pb_evn_t key_mask)
-{
-    if (is_long)
-    {
-        // Handle long press event
-    }
-    else
-    {
-        // Handle short press event
-    }
-}
-```
-
 #### Initialize with callback  
 ```c
+/* Optional in all cases, Can handle beep on/off by a pin or timer
+void pb_beep_on_cb(void)
+{
+   // turn on buzzer pin
+}
+
+void pb_beep_off_cb(void)
+{
+   // turn off buzzer pin
+}
+
+void pb_pressed_cb(bool is_long, pb_evn_t evn)
+{
+}
+
 int main(void)
 {
-    pb_init(my_pb_callback); // Initialize with callback
+    pb_init(); 
 
     while (1)
     {
@@ -131,7 +132,11 @@ int main(void)
 |----------|-------------|
 | `pb_init()` | Initialize push-button driver with config and optional callback |
 | `pb_clear()` | Clear pending events |
+| `pb_read()` | Read pending button events |
 | `pb_loop()` | Retrieve event from queue and optionally call callback |
+| `pb_pressed_cb()` | Callback button events |
+| `pb_beep_on_cb()` | Callback beep on |
+| `pb_beep_off_cb()` | Callback beep off |
 
 ---
 
