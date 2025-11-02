@@ -41,6 +41,9 @@
 /* Timer interval in milliseconds (scan period) */
 #define PB_INTERVAL_MS      10
 
+/* Beep on duration (ms) */
+#define PB_BEEP_TIME_MS     50
+
 /* Minimum press duration (ms) to register a short press */
 #define PB_SHORT_TIME_MS    50
 

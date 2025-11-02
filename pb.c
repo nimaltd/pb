@@ -53,15 +53,11 @@ const   pb_config_t pb_config[] = { PB_CONFIG };
  * @brief Initialize the push-button driver.
  * Sets configuration, callback, clears buffers, and starts
  * the timer interrupt for periodic button scanning.
- * @param[in] callback Optional event callback function.
  */
-void pb_init(void (*callback)(bool, pb_evn_t))
+void pb_init(void)
 {
   /* Check that configuration pointer is valid */
   assert_param(config != NULL);
-
-  /* Save configuration and callback */
-  pb_handle.callback = callback;
 
   /* Clear event buffer */
   pb_clear();
@@ -96,7 +92,7 @@ void pb_clear(void)
  * Retrieves next event from the queue and calls the user callback
  * (if registered). Returns the event for manual polling.
  */
-pb_evn_t pb_loop(void)
+pb_evn_t pb_read(void)
 {
   pb_evn_t event = 0;
 
@@ -104,14 +100,28 @@ pb_evn_t pb_loop(void)
   {
     event = pb_handle.evn[pb_handle.evn_tail];
     pb_handle.evn_tail = (pb_handle.evn_tail + 1) % PB_EVN_QUEUE_SIZE;
-
-    if (pb_handle.callback != NULL)
-    {
-      pb_handle.callback(event & PB_EVN_LONG_MASK, event & (~PB_EVN_LONG_MASK));
-    }
   }
 
   return event;
+}
+
+
+/*************************************************************************************************/
+/**
+ * @brief Process pending button events.
+ * Retrieves next event from the queue and calls the user callback
+ * (if registered). Returns the event for manual polling.
+ */
+void pb_loop(void)
+{
+  pb_evn_t event = 0;
+
+  if (pb_handle.evn_head != pb_handle.evn_tail)
+  {
+    event = pb_handle.evn[pb_handle.evn_tail];
+    pb_handle.evn_tail = (pb_handle.evn_tail + 1) % PB_EVN_QUEUE_SIZE;
+    pb_pressed_cb(event & PB_EVN_LONG_MASK, event & (~PB_EVN_LONG_MASK));
+  }
 }
 
 /*************************************************************************************************/
@@ -146,6 +156,16 @@ void pb_evn_add(pb_evn_t event)
  */
 void pb_tim_cb(TIM_HandleTypeDef *htim)
 {
+  /* Check beep */
+  if (pb_handle.beep)
+  {
+    pb_handle.beep--;
+    if (pb_handle.beep == 0)
+    {
+      pb_beep_off_cb();
+    }
+  }
+
   for (uint8_t i = 0; i < PB_CONFIG_COUNT; i++)
   {
     /* Released (logic high) */
@@ -168,8 +188,46 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
     {
       /* Count press duration */
       pb_handle.cnt[i]++;
+
+      /* Check beep */
+      if (pb_handle.beep == 0)
+      {
+        if (pb_handle.cnt[i] == (PB_SHORT_TIME_MS / PB_INTERVAL_MS))
+        {
+          pb_handle.beep = PB_BEEP_TIME_MS / PB_INTERVAL_MS;
+          pb_beep_on_cb();
+        }
+      }
     }
   }
+}
+
+/*************************************************************************************************/
+/**
+ * @brief Callback.
+ */
+__WEAK void pb_pressed_cb(bool is_long, pb_evn_t evn)
+{
+  UNUSED(is_long);
+  UNUSED(evn);
+}
+
+/*************************************************************************************************/
+/**
+ * @brief Callback.
+ */
+__WEAK void pb_beep_on_cb(void)
+{
+
+}
+
+/*************************************************************************************************/
+/**
+ * @brief Callback.
+ */
+__WEAK void pb_beep_off_cb(void)
+{
+
 }
 
 /*************************************************************************************************/
