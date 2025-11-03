@@ -61,8 +61,8 @@ typedef struct __PACKED
 /* Main handle for push-button driver */
 typedef struct
 {
-  int16_t             beep;                       /* Beep counter */
-  uint16_t            cnt[PB_CONFIG_COUNT];       /* Press duration counters for each button */
+  uint32_t            beep;                       /* Beep counter */
+  uint32_t            cnt[PB_CONFIG_COUNT];       /* Press duration counters for each button */
   pb_evn_t            evn[PB_EVN_QUEUE_SIZE];     /* Circular event buffer */
   __IO uint32_t       evn_head;                   /* Head index of the event queue (written by ISR) */
   __IO uint32_t       evn_tail;                   /* Tail index of the event queue (read by main loop) */

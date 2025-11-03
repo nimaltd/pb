@@ -56,14 +56,11 @@ const   pb_config_t pb_config[] = { PB_CONFIG };
  */
 void pb_init(void)
 {
-  /* Check that configuration pointer is valid */
-  assert_param(config != NULL);
-
   /* Clear event buffer */
   pb_clear();
 
   /* Configure timer for PB scanning */
-  __HAL_TIM_SET_AUTORELOAD(&PB_TIM, (PB_INTERVAL_MS * 1000) - 1);
+  __HAL_TIM_SET_AUTORELOAD(&PB_TIM, (PB_INTERVAL_MS * 1000U) - 1U);
   __HAL_TIM_SET_COUNTER(&PB_TIM, 0);
 
   /* Register callback and start timer interrupt */
@@ -99,7 +96,7 @@ pb_evn_t pb_read(void)
   if (pb_handle.evn_head != pb_handle.evn_tail)
   {
     event = pb_handle.evn[pb_handle.evn_tail];
-    pb_handle.evn_tail = (pb_handle.evn_tail + 1) % PB_EVN_QUEUE_SIZE;
+    pb_handle.evn_tail = (pb_handle.evn_tail + 1U) % PB_EVN_QUEUE_SIZE;
   }
 
   return event;
@@ -114,12 +111,17 @@ pb_evn_t pb_read(void)
  */
 void pb_loop(void)
 {
-  pb_evn_t event = 0;
-
   if (pb_handle.evn_head != pb_handle.evn_tail)
   {
-    event = pb_handle.evn[pb_handle.evn_tail];
-    pb_handle.evn_tail = (pb_handle.evn_tail + 1) % PB_EVN_QUEUE_SIZE;
+    uint32_t tail = pb_handle.evn_tail;
+    pb_evn_t event = pb_handle.evn[tail];
+
+    /* Advance tail before executing callback */
+    pb_handle.evn_tail = (tail + 1U) % PB_EVN_QUEUE_SIZE;
+
+    /* Memory barrier for robustness */
+    __DMB();
+
     pb_pressed_cb(event & PB_EVN_LONG_MASK, event & (~PB_EVN_LONG_MASK));
   }
 }
@@ -136,12 +138,15 @@ void pb_loop(void)
  */
 void pb_evn_add(pb_evn_t event)
 {
-  uint32_t next_head = (pb_handle.evn_head + 1) % PB_EVN_QUEUE_SIZE;
+  uint32_t next_head = (pb_handle.evn_head + 1U) % PB_EVN_QUEUE_SIZE;
 
   /* Check if queue is not full */
   if (next_head != pb_handle.evn_tail)
   {
     pb_handle.evn[pb_handle.evn_head] = event;
+
+    /* Ensure event is written before publishing head */
+    __DMB();
     pb_handle.evn_head = next_head;
   }
   /* else: queue full */
