@@ -16,7 +16,8 @@ The library is designed for:
 ## ✨ Features  
 
 -  Multi-button support (`PB_CONFIG_COUNT`)  
--  Short and long press detection (`PB_SHORT_TIME_MS`, `PB_LONG_TIME_MS`)  
+-  Short and long press detection
+-  Detect simultaneously pressed push-buttons
 -  Event queue with configurable size (`PB_EVN_QUEUE_SIZE`)  
 -  Optional callback on button events
 -  Debouncing for all buttons
