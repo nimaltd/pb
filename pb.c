@@ -102,7 +102,6 @@ pb_evn_t pb_read(void)
   return event;
 }
 
-
 /*************************************************************************************************/
 /**
  * @brief Process pending button events.
@@ -122,6 +121,7 @@ void pb_loop(void)
     /* Memory barrier for robustness */
     __DMB();
 
+    /* Call callback */
     pb_pressed_cb(event & PB_EVN_LONG_MASK, event & (~PB_EVN_LONG_MASK));
   }
 }
@@ -147,6 +147,8 @@ void pb_evn_add(pb_evn_t event)
 
     /* Ensure event is written before publishing head */
     __DMB();
+
+    /* Update head */
     pb_handle.evn_head = next_head;
   }
   /* else: queue full */
@@ -161,6 +163,10 @@ void pb_evn_add(pb_evn_t event)
  */
 void pb_tim_cb(TIM_HandleTypeDef *htim)
 {
+  pb_evn_t tmp_evn = 0;
+  static pb_evn_t last_evn = 0;
+  static uint32_t last_time = 0;
+
   /* Check beep */
   if (pb_handle.beep)
   {
@@ -171,6 +177,7 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
     }
   }
 
+  /* Scanning all pins */
   for (uint8_t i = 0; i < PB_CONFIG_COUNT; i++)
   {
     /* Released (logic high) */
@@ -178,11 +185,11 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
     {
       if (pb_handle.cnt[i] >= (PB_LONG_TIME_MS / PB_INTERVAL_MS))
       {
-        pb_evn_add((1 << i) | PB_EVN_LONG_MASK);
+        tmp_evn |= ((1 << i) | PB_EVN_LONG_MASK);
       }
       else if (pb_handle.cnt[i] >= (PB_SHORT_TIME_MS / PB_INTERVAL_MS))
       {
-        pb_evn_add(1 << i);
+        tmp_evn |= (1 << i);
       }
 
       /* Reset after release */
@@ -204,6 +211,20 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
         }
       }
     }
+  }
+
+  /* Collect all events */
+  if (tmp_evn)
+  {
+    last_evn |= tmp_evn;
+    last_time = HAL_GetTick();
+  }
+
+  /* Wait for PB_BEEP_TIME_MS to release all push-buttons and add event */
+  if ((last_evn != 0 ) && (HAL_GetTick() - last_time >= PB_BEEP_TIME_MS))
+  {
+    pb_evn_add(last_evn);
+    last_evn = 0;
   }
 }
 
