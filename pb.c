@@ -91,7 +91,7 @@ void pb_clear(void)
  */
 pb_evn_t pb_read(void)
 {
-  pb_evn_t event = 0;
+  pb_evn_t event = {0};
 
   if (pb_handle.evn_head != pb_handle.evn_tail)
   {
@@ -122,7 +122,7 @@ void pb_loop(void)
     __DMB();
 
     /* Call callback */
-    pb_pressed_cb(event & PB_EVN_LONG_MASK, event & (~PB_EVN_LONG_MASK));
+    pb_pressed_cb(event);
   }
 }
 
@@ -163,8 +163,8 @@ void pb_evn_add(pb_evn_t event)
  */
 void pb_tim_cb(TIM_HandleTypeDef *htim)
 {
-  pb_evn_t tmp_evn = 0;
-  static pb_evn_t last_evn = 0;
+  pb_evn_t tmp_evn = {0};
+  static pb_evn_t last_evn = {0};
   static uint32_t last_time = 0;
 
   /* Check beep */
@@ -181,15 +181,21 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
   for (uint8_t i = 0; i < PB_CONFIG_COUNT; i++)
   {
     /* Released (logic high) */
+#if (PB_IDLE_IS_HIGH == 1)
     if (pb_config[i].gpio->IDR & pb_config[i].pin)
+#else
+    if (!(pb_config[i].gpio->IDR & pb_config[i].pin))
+#endif
     {
       if (pb_handle.cnt[i] >= (PB_LONG_TIME_MS / PB_INTERVAL_MS))
       {
-        tmp_evn |= ((1 << i) | PB_EVN_LONG_MASK);
+        tmp_evn.mask |= (1 << i);
+        tmp_evn.long_press = 1;
       }
       else if (pb_handle.cnt[i] >= (PB_SHORT_TIME_MS / PB_INTERVAL_MS))
       {
-        tmp_evn |= (1 << i);
+        tmp_evn.mask |= (1 << i);
+        tmp_evn.long_press = 0;
       }
 
       /* Reset after release */
@@ -214,17 +220,19 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
   }
 
   /* Collect all events */
-  if (tmp_evn)
+  if (tmp_evn.mask)
   {
-    last_evn |= tmp_evn;
+    last_evn.mask |= tmp_evn.mask;
+    last_evn.long_press |= tmp_evn.long_press;
     last_time = HAL_GetTick();
   }
 
   /* Wait for PB_BEEP_TIME_MS to release all push-buttons and add event */
-  if ((last_evn != 0 ) && (HAL_GetTick() - last_time >= PB_BEEP_TIME_MS))
+  if ((last_evn.mask != 0 ) && (HAL_GetTick() - last_time >= PB_BEEP_TIME_MS))
   {
     pb_evn_add(last_evn);
-    last_evn = 0;
+    last_evn.long_press = 0;
+    last_evn.mask = 0;
   }
 }
 
@@ -232,9 +240,8 @@ void pb_tim_cb(TIM_HandleTypeDef *htim)
 /**
  * @brief Callback.
  */
-__WEAK void pb_pressed_cb(bool is_long, pb_evn_t evn)
+__WEAK void pb_pressed_cb(pb_evn_t evn)
 {
-  UNUSED(is_long);
   UNUSED(evn);
 }
 

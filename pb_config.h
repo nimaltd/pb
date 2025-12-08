@@ -53,6 +53,9 @@
 /* Size of the event queue (number of events that can be stored) */
 #define PB_EVN_QUEUE_SIZE   4
 
+/* Set idle state  */
+#define PB_IDLE_IS_HIGH     1
+
 /* Number of buttons configured */
 #define PB_CONFIG_COUNT     3
 

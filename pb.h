@@ -34,19 +34,17 @@ extern "C" {
 #include "pb_config.h"
 
 /*************************************************************************************************/
-/** Definitions **/
-/*************************************************************************************************/
-
-/* Mask to indicate a long press event in pb_evn_t */
-#define PB_EVN_LONG_MASK      0x80000000
-
-/*************************************************************************************************/
 /** Typedef/Struct/Enum **/
 /*************************************************************************************************/
 
 /*************************************************************************************************/
-/* Button event type (bitmask + optional long press flag) */
-typedef uint32_t      pb_evn_t;
+/* Button event type (bitmask + long press flag) */
+typedef struct
+{
+  uint32_t            long_press:1;
+  uint32_t            mask:31;
+
+} pb_evn_t;
 
 /*************************************************************************************************/
 /* Configuration structure for a single push-button */
@@ -86,7 +84,7 @@ pb_evn_t  pb_read(void);
 void      pb_loop(void);
 
 /* Callback button events */
-void      pb_pressed_cb(bool is_long, pb_evn_t evn);
+void      pb_pressed_cb(pb_evn_t evn);
 
 /* Callback beep on */
 void      pb_beep_on_cb(void);
