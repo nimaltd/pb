@@ -60,7 +60,7 @@ Defines library parameters and timing values.
 ## 🛠 CubeMX Setup  
 
 1. **GPIO Pins**  
-   - Configure button pins as **Input with Pull-Up** (active-low buttons recommended).  
+   - Configure button pins as **Input with Pull-Up** (idle-high buttons recommended).  
 
 2. **Timer**  
    - Use **internal clock source**.  
@@ -89,7 +89,7 @@ int main(void)
     while (1)
     {
         pb_evn = pb_read(); // Get next event from queue
-        if (pb_evn)
+        if (pb_evn.mask)
         {
             // 0x00000001 for short press, first key
             // 0x00000002 for short press, second key
@@ -117,7 +117,7 @@ void pb_beep_off_cb(void)
    // turn off buzzer pin
 }
 
-void pb_pressed_cb(bool is_long, pb_evn_t evn)
+void pb_pressed_cb(pb_evn_t evn)
 {
 }
 
